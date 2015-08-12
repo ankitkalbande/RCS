@@ -47,7 +47,7 @@ JLINK_DIR 			= /opt/SEGGER/JLink/
 JLINK 					= $(JLINK_DIR)JLinkExe
 JLINKGDBSERVER	= $(JLINK_DIR)JLinkGDBServer
 
-FLASH_START_ADDRESS = 0x14000 #0x20000
+FLASH_START_ADDRESS = 0x20000 #0x14000 #0x20000
 SOFTDEVICE = lib/softdevice/s110_nrf51822_5.1.0_softdevice.hex
 
 # Include directories
@@ -111,7 +111,7 @@ LDDIRS 	 = "$(GCC_INSTALL_ROOT)/$(GCC_PREFIX)/lib/armv6-m"
 LDDIRS 	+= "$(GCC_INSTALL_ROOT)/lib/gcc/$(GCC_PREFIX)/$(GCC_VERSION)/armv6-m"
 LDDIRS	+= $(SDK_TEMPLATE)
 
-LD_SCRIPT = $(SDK_TEMPLATE)gcc_nrf51_s110_xxaa.ld
+LD_SCRIPT = $(SDK_TEMPLATE)gcc_nrf51_s130_xxaa.ld
 
 LDFLAGS  = -Xlinker 
 LDFLAGS += -Map=$(BIN_DIR)/$(OUTPUT_NAME).map
