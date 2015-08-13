@@ -48,6 +48,7 @@
 #include "ble_radio_notification.h"
 #include "ble_flash.h"
 #include "ble_debug_assert_handler.h"
+#include "radio_config.h"
 
 
 #define HR_INC_BUTTON_PIN_NO                 EVAL_BOARD_BUTTON_0                       /**< Button used to increment heart rate. */
@@ -107,7 +108,7 @@ static volatile uint16_t                     m_cur_heart_rate;                  
 static app_timer_id_t                        m_battery_timer_id;                       /**< Battery timer. */
 static app_timer_id_t                        m_heart_rate_timer_id;                    /**< Heart rate measurement timer. */
 
-
+static uint8_t volatile packet[4];
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
 
 
@@ -682,11 +683,31 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 
 /**@brief Application main function.
  */
+
+
+void init(void)
+{
+  /* Start 16 MHz crystal oscillator */
+  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+  NRF_CLOCK->TASKS_HFCLKSTART = 1;
+
+  /* Wait for the external oscillator to start up */
+  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) 
+  {
+  }
+
+  nrf_gpio_range_cfg_output(1, 2);
+
+  // Set radio configuration parameters
+  radio_configure();
+}
+
+
 int main(void)
 {
-
-	nrf_gpio_cfg_output(1);
-	nrf_gpio_cfg_output(2);
+	init();
+	//nrf_gpio_cfg_output(1);
+	//nrf_gpio_cfg_output(2);
 
 	while(true)
 	{
@@ -696,6 +717,24 @@ int main(void)
 		nrf_gpio_pin_clear(1);
 		nrf_gpio_pin_set(2);
 		nrf_delay_ms(1000);
+		
+		NRF_RADIO->PACKETPTR = (uint32_t)packet;
+    NRF_RADIO->EVENTS_READY = 0U;
+    // Enable radio and wait for ready
+    NRF_RADIO->TASKS_RXEN = 1U;
+    while(NRF_RADIO->EVENTS_READY == 0U)
+    {
+    }
+    NRF_RADIO->EVENTS_END = 0U;
+    // Start listening and wait for address received event
+    NRF_RADIO->TASKS_START = 1U;
+    // Wait for end of packet
+    while(NRF_RADIO->EVENTS_END == 0U)
+    {
+    }
+    // Write received data to LED0 and LED1 on CRC match
+
+
 	
 	}
 

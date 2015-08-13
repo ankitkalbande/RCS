@@ -62,7 +62,7 @@ INCLUDEDIRS	+= $(shell find $(SDK_INCLUDE) -type d)
 
 # Project Source
 C_SRC  = main.c
-#C_SRC += battery.c
+C_SRC += radio_config.c
 #C_SRC += led.c
 
 # APP Common
